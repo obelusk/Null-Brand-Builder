@@ -1,0 +1,52 @@
+{
+  "name": "null-brand-builder",
+  "version": "0.1.0",
+  "description": "Offline-first cross-platform brand kit builder — fonts, colors, and export.",
+  "author": "Obelusk (Sean Lusk)",
+  "license": "MIT",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "test:smoke": "electron test/smoke.js",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win",
+    "dist:mac": "electron-builder --mac",
+    "dist:linux": "electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.obelusk.nullbrandbuilder",
+    "productName": "Null Brand Builder",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.png"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.png",
+      "category": "public.app-category.graphics-design"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.png",
+      "category": "Graphics"
+    }
+  },
+  "devDependencies": {
+    "electron": "^42.4.1",
+    "electron-builder": "^26.15.3"
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0",
+    "fontkit": "^2.0.4",
+    "node-vibrant": "^4.0.4",
+    "svgson": "^5.3.1"
+  }
+}

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' file: https://fonts.gstatic.com; img-src 'self' data: file:;" />
+  <title>Null Brand Builder</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Color-blindness simulation filters -->
+  <svg class="cvd-filters" aria-hidden="true">
+    <defs>
+      <filter id="cvd-protanopia"><feColorMatrix type="matrix" values="0.567 0.433 0 0 0  0.558 0.442 0 0 0  0 0.242 0.758 0 0  0 0 0 1 0"/></filter>
+      <filter id="cvd-deuteranopia"><feColorMatrix type="matrix" values="0.625 0.375 0 0 0  0.7 0.3 0 0 0  0 0.3 0.7 0 0  0 0 0 1 0"/></filter>
+      <filter id="cvd-tritanopia"><feColorMatrix type="matrix" values="0.95 0.05 0 0 0  0 0.433 0.567 0 0  0 0.475 0.525 0 0  0 0 0 1 0"/></filter>
+    </defs>
+  </svg>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 40" xmlns="http://www.w3.org/2000/svg" fill="#389afc">
+          <path d="M2.96061,26.561l4.96533-.72144a2.44483,2.44483,0,0,0,1.37818-.69116L25.37785,9.07463A4.15964,4.15964,0,0,0,25.21574,3.038a4.31883,4.31883,0,0,0-5.88721.32055l-.772.772a.93614.93614,0,0,1-1.32373,0,2.99964,2.99964,0,0,0-4.24243,0L7.76774,9.35417A.99989.99989,0,0,0,9.18205,10.768L14.4047,5.54435a1.00276,1.00276,0,0,1,1.41407,0,.93649.93649,0,0,1-.00025,1.32422l-12.397,12.397A2.44547,2.44547,0,0,0,2.73039,20.644L2.009,25.6093A.83955.83955,0,0,0,2.96061,26.561Z"/>
+          <path d="M18.85173,22.67668a7.11559,7.11559,0,0,1-2.38038,1.94726,9.84611,9.84611,0,0,1-3.73632.38672c-.31006-.00586-.61817-.01172-.92286-.01172a1,1,0,1,0,0,2c.29249,0,.58838.00586.88575.01075a11.447,11.447,0,0,0,4.49756-.52149A8.38327,8.38327,0,0,0,20.174,24.19133v4.2539a1.52643,1.52643,0,0,0,2.60693,1.08008l2.22168-2.22168a4.39126,4.39126,0,0,1,3.84913-1.47754,1.00026,1.00026,0,0,0,.29589-1.97851,6.37456,6.37456,0,0,0-5.55957,2.042L22.174,27.30363V23.00676a1.5268,1.5268,0,0,0-2.60693-1.0791C19.32682,22.16691,19.0905,22.42082,18.85173,22.67668Z"/>
+          <circle cx="21.17399" cy="18.69304" r="1.25"/>
+        </svg>
+      </span>
+      <span class="brand-name">Null Brand Builder</span>
+    </div>
+    <div class="kit-name-wrap">
+      <input id="kitName" class="kit-name" type="text" placeholder="Untitled brand kit" aria-label="Brand kit name" />
+    </div>
+    <div class="topbar-actions">
+      <button id="btnRefreshFonts" class="btn ghost" title="Re-scan system fonts">↻ Refresh</button>
+      <button id="btnReset" class="btn ghost" title="Reset all fonts and colors to defaults">Reset to Default</button>
+      <button id="btnRandomize" class="btn ghost" title="Randomize all four fonts">🎲 Randomize</button>
+      <button id="btnDiscover" class="btn ghost" title="Browse and download Google Fonts">🔍 Discover</button>
+      <button id="btnCompare" class="btn ghost" title="Compare two brand kits side by side">⇄ Compare</button>
+      <button id="btnExportCss" class="btn">Export CSS</button>
+      <button id="btnExportJson" class="btn">Export JSON</button>
+      <button id="btnExportPdf" class="btn">Export PDF</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- LEFT: live canvas -->
+    <section class="canvas-wrap">
+      <div class="canvas-toolbar">
+        <div class="seg" role="group" aria-label="Background">
+          <span class="seg-label">Background</span>
+          <button class="seg-btn active" data-bg="base">Base</button>
+          <button class="seg-btn" data-bg="light">Light</button>
+          <button class="seg-btn" data-bg="dark">Dark</button>
+        </div>
+        <div class="seg">
+          <span class="seg-label">Vision</span>
+          <select id="cvdSelect" class="mini-select" aria-label="Color blindness simulation">
+            <option value="">Normal</option>
+            <option value="cvd-deuteranopia">Deuteranopia</option>
+            <option value="cvd-protanopia">Protanopia</option>
+            <option value="cvd-tritanopia">Tritanopia</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="canvas" class="canvas" tabindex="0">
+        <!-- type levels injected here -->
+      </div>
+      <p class="canvas-hint">Select a level (click it here or in the sidebar), then <kbd>←</kbd> <kbd>→</kbd> cycle fonts, <kbd>↑</kbd> <kbd>↓</kbd> switch category, and <kbd>F</kbd> favorites the current font. Click the preview text to edit it.</p>
+    </section>
+
+    <!-- RIGHT: controls -->
+    <aside class="panel">
+      <section class="panel-section">
+        <h2 class="panel-h">Typography</h2>
+        <div id="typeControls" class="type-controls"><!-- per-level controls --></div>
+      </section>
+
+      <section class="panel-section">
+        <h2 class="panel-h">Color Palette</h2>
+        <div id="colorControls" class="color-controls"><!-- per-role controls --></div>
+      </section>
+
+      <section class="panel-section">
+        <h2 class="panel-h">Logo</h2>
+        <div id="logoDrop" class="logo-drop" tabindex="0" role="button" aria-label="Upload a PNG or SVG logo">
+          <div class="logo-drop-empty">
+            <div class="logo-drop-icon">⬆</div>
+            <div>Drop a <strong>PNG</strong> or <strong>SVG</strong> here</div>
+            <div class="logo-drop-sub">or click to browse</div>
+          </div>
+          <div class="logo-loaded hidden">
+            <span id="logoName" class="logo-name"></span>
+            <span id="logoBadge" class="logo-badge"></span>
+          </div>
+        </div>
+        <input id="logoFileInput" type="file" accept=".png,.svg" hidden />
+
+        <div id="logoTools" class="logo-tools hidden">
+          <div class="logo-actions">
+            <button id="btnReextract" class="btn tiny ghost" title="Re-read colors from the file">↻ Re-extract</button>
+            <button id="btnRemoveLogo" class="btn tiny ghost" title="Remove logo">✕ Remove</button>
+          </div>
+          <div class="swatch-help">Extracted colors — click one to assign it to a palette role:</div>
+          <div id="logoSwatches" class="logo-swatches"></div>
+        </div>
+      </section>
+
+      <section class="panel-section">
+        <h2 class="panel-h">Brand Kits</h2>
+        <div class="kit-save-row">
+          <button id="btnSaveKit" class="btn full">Save current as kit</button>
+        </div>
+        <ul id="kitList" class="kit-list"></ul>
+      </section>
+    </aside>
+  </main>
+
+  <!-- Phase 4 — Google Fonts Discovery modal -->
+  <div id="gfModal" class="gf-modal hidden" role="dialog" aria-modal="true" aria-label="Discover Google Fonts">
+    <div class="gf-box">
+      <div class="gf-head">
+        <h2>Discover Google Fonts</h2>
+        <button id="gfClose" class="icon-btn" title="Close" aria-label="Close">✕</button>
+      </div>
+
+      <div id="gfOffline" class="gf-state hidden">📡 You're offline. Connect to the internet to browse Google Fonts.</div>
+
+      <div id="gfKeySetup" class="gf-keysetup hidden">
+        <p>Browsing Google Fonts needs a free <strong>Google Fonts Developer API key</strong>. It's stored only on this machine.</p>
+        <ol>
+          <li>Open the <a href="#" id="gfKeyLink">Google Fonts API console</a> and create/copy a key.</li>
+          <li>Paste it below and save.</li>
+        </ol>
+        <div class="gf-key-row">
+          <input id="gfKeyInput" type="text" placeholder="Paste API key…" spellcheck="false" />
+          <button id="gfKeySave" class="btn">Save key</button>
+        </div>
+      </div>
+
+      <div id="gfBrowser" class="gf-browser hidden">
+        <div class="gf-toolbar">
+          <input id="gfSearch" type="text" placeholder="Search fonts…" spellcheck="false" />
+          <select id="gfCategory" class="mini-select"></select>
+          <button id="gfChangeKey" class="btn tiny ghost" title="Change API key">Change key</button>
+        </div>
+        <div id="gfStatus" class="gf-status"></div>
+        <div id="gfList" class="gf-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 5 — side-by-side A/B compare -->
+  <div id="cmpModal" class="cmp-modal hidden" role="dialog" aria-modal="true" aria-label="Compare brand kits">
+    <div class="cmp-box">
+      <div class="cmp-head">
+        <h2>Compare Brand Kits</h2>
+        <button id="cmpClose" class="icon-btn" title="Close" aria-label="Close">✕</button>
+      </div>
+      <div class="cmp-cols">
+        <div class="cmp-col">
+          <select id="cmpSelectA" class="mini-select cmp-select" aria-label="Kit A"></select>
+          <div id="cmpPreviewA" class="cmp-preview"></div>
+        </div>
+        <div class="cmp-col">
+          <select id="cmpSelectB" class="mini-select cmp-select" aria-label="Kit B"></select>
+          <div id="cmpPreviewB" class="cmp-preview"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="scanOverlay" class="scan-overlay hidden">
+    <div class="scan-box">
+      <div class="scan-spinner"></div>
+      <div id="scanText">Scanning fonts…</div>
+      <div class="scan-bar"><div id="scanBarFill" class="scan-bar-fill"></div></div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
