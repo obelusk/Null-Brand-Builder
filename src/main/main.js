@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-const { scanFonts, appFontsDir } = require('./fonts');
+const { scanFonts, appFontsDir, SCAN_VERSION } = require('./fonts');
 const store = require('./store');
 const { buildCss, buildJsonTokens } = require('./exporters');
 const { extractLogoColors } = require('./logo');
@@ -78,7 +78,7 @@ app.on('window-all-closed', () => {
 
 ipcMain.handle('fonts:get', async (event, { force = false } = {}) => {
   const cached = store.get('fontCache');
-  if (cached && !force) return cached;
+  if (cached && !force && cached.version === SCAN_VERSION) return cached;
 
   const result = await scanFonts((done, total) => {
     if (mainWindow && !mainWindow.isDestroyed()) {

@@ -115,6 +115,19 @@ function variantFor(level) {
     || fam.variants.find((v) => v.weight === level.weight)
     || fam.variants[0] || null;
 }
+// The default variant for a family is always Regular (400 normal) when present,
+// then any normal-style variant, then whatever comes first in priority order.
+function regularVariant(fam) {
+  if (!fam) return null;
+  return fam.variants.find((v) => v.weight === 400 && v.style === 'normal')
+    || fam.variants.find((v) => v.style === 'normal')
+    || fam.variants[0] || null;
+}
+// Conventional style label: 400 → Regular/Italic, 700 → Bold/Bold Italic, else weight name + Italic.
+function variantLabel(v) {
+  if (v.weight === 400) return v.style === 'italic' ? 'Italic' : 'Regular';
+  return v.weightName + (v.style === 'italic' ? ' Italic' : '');
+}
 // Namespace preview fonts so they can never override the app's own UI fonts
 // (e.g. Segoe UI / Roboto), which would re-shape the toolbar and make it jump.
 function fontAlias(family) { return 'nbbf-' + family; }
@@ -279,8 +292,7 @@ function renderTypeControls() {
             ${variants.map((v) => {
               const val = `${v.weight}:${v.style}`;
               const sel = (v.weight === st.weight && v.style === st.style) ? ' selected' : '';
-              const lbl = v.weightName + (v.style === 'italic' ? ' Italic' : '');
-              return `<option value="${val}"${sel}>${lbl}</option>`;
+              return `<option value="${val}"${sel}>${variantLabel(v)}</option>`;
             }).join('') || '<option>Regular</option>'}
           </select>
           <input class="size-input" data-id="${lvl.id}" type="number" min="8" max="200" value="${st.size}" />
@@ -335,14 +347,9 @@ function refreshFamilySelect(id) {
 function setFamily(id, family, skipRerender) {
   const st = state.levels[id];
   st.family = family;
-  const fam = familyByName.get(family);
-  if (fam) {
-    // keep weight if available, else pick closest
-    if (!fam.variants.some((v) => v.weight === st.weight && v.style === st.style)) {
-      const same = fam.variants.find((v) => v.weight === st.weight) || fam.variants[0];
-      if (same) { st.weight = same.weight; st.style = same.style; }
-    }
-  }
+  // Selecting a font always defaults to its Regular style.
+  const v = regularVariant(familyByName.get(family));
+  if (v) { st.weight = v.weight; st.style = v.style; }
   applyLevel(id);
   if (!skipRerender) renderTypeControls();
   scheduleAutosave();
@@ -870,16 +877,11 @@ function applyDefaults(resetText) {
     st.category = 'All';
     st._search = '';
     st.size = l.defaultSize;
-    st.weight = l.defaultWeight;
+    st.weight = 400;
     st.style = 'normal';
     if (fam) {
       st.family = fam.family;
-      let v = fam.variants.find((x) => x.weight === st.weight && x.style === 'normal');
-      if (!v) {
-        const normals = fam.variants.filter((x) => x.style === 'normal');
-        const pool = normals.length ? normals : fam.variants;
-        v = pool.reduce((a, b) => (Math.abs(b.weight - st.weight) < Math.abs(a.weight - st.weight) ? b : a));
-      }
+      const v = regularVariant(fam); // always start at Regular
       if (v) { st.weight = v.weight; st.style = v.style; }
     }
     if (resetText) state.texts[l.id] = l.placeholder;

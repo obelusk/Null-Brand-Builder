@@ -17,6 +17,18 @@ async function getFontkit() {
 
 const SUPPORTED_EXT = new Set(['.ttf', '.otf']);
 
+// Bump when the scan output shape/ordering changes, to invalidate stale caches.
+const SCAN_VERSION = 2;
+
+// Priority for ordering a family's variants: Regular > Italic > Bold > Bold Italic > rest.
+function styleRank(v) {
+  if (v.weight === 400 && v.style === 'normal') return 0;
+  if (v.weight === 400 && v.style === 'italic') return 1;
+  if (v.weight === 700 && v.style === 'normal') return 2;
+  if (v.weight === 700 && v.style === 'italic') return 3;
+  return 4;
+}
+
 function appFontsDir() {
   return path.join(os.homedir(), 'NullBrandBuilder', 'fonts');
 }
@@ -172,14 +184,18 @@ async function scanFonts(onProgress) {
   if (onProgress) onProgress(total, total);
 
   const families = [...familyMap.values()];
-  // Sort variants within each family by weight then style.
+  // Sort variants by a familiar priority: Regular, Italic, Bold, Bold Italic,
+  // then remaining weights ascending (normal before italic within each weight).
   for (const fam of families) {
-    fam.variants.sort((a, b) => a.weight - b.weight || a.style.localeCompare(b.style));
+    fam.variants.sort((a, b) =>
+      styleRank(a) - styleRank(b)
+      || a.weight - b.weight
+      || (a.style === b.style ? 0 : a.style === 'normal' ? -1 : 1));
   }
   // Sort families alphabetically (case-insensitive).
   families.sort((a, b) => a.family.toLowerCase().localeCompare(b.family.toLowerCase()));
 
-  return { families, count: families.length, scannedAt: Date.now() };
+  return { families, count: families.length, scannedAt: Date.now(), version: SCAN_VERSION };
 }
 
-module.exports = { scanFonts, appFontsDir, systemFontDirs };
+module.exports = { scanFonts, appFontsDir, systemFontDirs, SCAN_VERSION };
