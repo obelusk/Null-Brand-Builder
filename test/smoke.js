@@ -3,6 +3,14 @@
 // Exits 0 on success, 1 on any failure.
 
 const { app, BrowserWindow, ipcMain } = require('electron');
+
+// CI hardening: Ubuntu 24.04 restricts unprivileged user namespaces, which breaks
+// Chromium's sandbox under GitHub Actions. Disable it + GPU for headless runs.
+app.commandLine.appendSwitch('no-sandbox');
+app.commandLine.appendSwitch('disable-gpu');
+app.commandLine.appendSwitch('disable-dev-shm-usage');
+app.disableHardwareAcceleration();
+
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
